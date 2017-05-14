@@ -24,6 +24,59 @@ function(caffe_generate_export_configs)
     set(HAVE_CUDA FALSE)
   endif()
 
+  if(USE_OPENCV)
+    list(APPEND Caffe_DEFINITIONS -DUSE_OPENCV)
+  endif()
+
+  set(GFLAGS_IMPORTED OFF)
+  foreach(_lib ${GFLAGS_LIBRARIES})
+    if(TARGET ${_lib})
+      set(GFLAGS_IMPORTED ON)
+    endif()
+  endforeach()
+
+  set(GLOG_IMPORTED OFF)
+  foreach(_lib ${GLOG_LIBRARIES})
+    if(TARGET ${_lib})
+      set(GLOG_IMPORTED ON)
+    endif()
+  endforeach()
+
+  set(HDF5_IMPORTED OFF)
+  foreach(_lib ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+    if(TARGET ${_lib})
+      set(HDF5_IMPORTED ON)
+    endif()
+  endforeach()
+
+  set(LMDB_IMPORTED OFF)
+  if(USE_LMDB)
+    foreach(_lib ${LMDB_LIBRARIES})
+      if(TARGET ${_lib})
+        set(LMDB_IMPORTED ON)
+      endif()
+    endforeach()
+  endif()
+  set(LEVELDB_IMPORTED OFF)
+  set(SNAPPY_IMPORTED OFF)
+  if(USE_LEVELDB)
+    foreach(_lib ${LevelDB_LIBRARIES})
+      if(TARGET ${_lib})
+        set(LEVELDB_IMPORTED ON)
+      endif()
+    endforeach()
+    foreach(_lib ${Snappy_LIBRARIES})
+      if(TARGET ${_lib})
+        set(SNAPPY_IMPORTED ON)
+      endif()
+    endforeach()
+  endif()
+
+  # This code is taken from https://github.com/sh1r0/caffe-android-lib
+  if(USE_HDF5)
+    list(APPEND Caffe_DEFINITIONS -DUSE_HDF5)
+  endif()
+
   if(NOT HAVE_CUDNN)
     set(HAVE_CUDNN FALSE)
   endif()
@@ -46,7 +99,7 @@ function(caffe_generate_export_configs)
 
   # ---[ Configure and install version file ]---
 
-  # TODO: Lines below are commented because Caffe does't declare its version in headers.
+  # TODO: Lines below are commented because Caffe doesn't declare its version in headers.
   # When the declarations are added, modify `caffe_extract_caffe_version()` macro and uncomment
 
   # configure_file(cmake/Templates/CaffeConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/CaffeConfigVersion.cmake" @ONLY)
